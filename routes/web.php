@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,29 @@ Route::get('/', function () {
 
 // Route::resource('posts', '\App\Http\Controllers\PostController');
 
-Route::get('/contact', '\App\Http\Controllers\PostController@contact');
+// Route::get('/contact', '\App\Http\Controllers\PostController@contact');
 
-Route::get('/post/{id}/{name}/{age}', '\App\Http\Controllers\PostController@showPost');
+// Route::get('/post/{id}/{name}/{age}', '\App\Http\Controllers\PostController@showPost');
+
+Route::get('/insert', function() {
+    DB::insert('insert into posts(post_title, post_body) values(?, ?)', ['PHP with Laravel', 'Laravel is the best thing']);
+});
+
+Route::get('/read', function () {
+    $results = DB::select('select * from posts where post_id = ?', [2]);
+
+    foreach ($results as $post) {
+        return $post->post_title;
+    }
+});
+
+Route::get('/update', function() {
+    $updated = DB::update('update posts set post_title = "New PHP with Laravel" where post_id = ?', [2]);
+
+    return $updated;
+});
+
+Route::get('/delete', function() {
+    $deleted = DB::delete('delete from posts where post_id = ?', [2]);
+    return $deleted;
+});
