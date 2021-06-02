@@ -4,6 +4,14 @@ use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Models\Post;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Country;
+use App\Models\Photo;
+use App\Models\Video;
+use App\Models\Tag;
+use App\Models\Taggable;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -115,8 +123,9 @@ Route::get('/findmore', function() {
 Route::get('/basicinsert', function() {
     $post = new Post;
 
-    $post->post_title = 'New post tilte';
+    $post->post_title = 'New post tilte 3';
     $post->post_body = 'new content';
+    $post->user_id = 1;
 
     $post->save();
 
@@ -160,4 +169,185 @@ Route::get('/restore', function() {
 
 Route::get('/forcedelete', function() {
     $post = Post::withTrashed()->where('id', 1)->forcedelete();
+});
+
+Route::get('/adduser', function() {
+    $user = new User;
+
+    $user->name = 'Basi';
+    $user->email = 'test3@test.com';
+    $user->password = '12345';
+
+    $user->save();
+});
+
+Route::get('/user/{id}/post', function($id) {
+    return User::find($id)->post;
+});
+
+Route::get('/post/{id}/user', function($id){
+    return Post::find($id)->user->name;
+});
+
+Route::get('/posts/{id}', function($id) {
+    $user = User::find($id);
+    foreach($user->posts as $post){
+        echo $post->post_title."<br>";
+    }
+});
+
+Route::get('/addrole', function() {
+    $role = new Role;
+    $role->name = 'administrator';
+
+    $role->save();
+
+    $role2 = new Role;
+    $role2->name = 'subscriber';
+    $role2->save();
+});
+
+Route::get('/user/{id}/role', function($id) {
+    $user = User::find($id);
+
+    foreach($user->roles as $role){
+        echo $role->name;
+    };
+});
+
+Route::get('user/pivot', function() {
+    $user = User::find(1);
+
+    foreach($user->roles as $role){
+        echo $role->pivot->created_at;
+    }
+});
+
+Route::get('/user/country', function(){
+
+});
+
+Route::get('/addCountry', function(){
+    $country = new Country;
+    $country->name = 'Canada';
+
+    $country->save();
+});
+
+Route::get('/updateuser', function(){
+    User::where('id',4)->update(['country_id'=>3]);
+});
+
+Route::get('/user/country/{id}', function($id) {
+    $country = Country::find($id);
+
+    foreach($country->posts as $post){
+        echo $post->post_title.'<br>';
+        echo $post->post_body.'<br>';
+        echo '<br>';
+    }
+});
+
+Route::get('/insertPhoto', function(){
+    $photo1 = new Photo;
+    $photo1->path = 'basi.jpg';
+    $photo1->imageable_id = 1;
+    $photo1->imageable_type = 'App\Models\User';
+    $photo1->save();
+
+    $photo2 = new Photo;
+    $photo2->path = 'post.jpg';
+    $photo2->imageable_id = 1;
+    $photo2->imageable_type = 'App\Models\Post';
+    $photo2->save();
+});
+
+Route::get('/user/{id}/photos', function($id){
+    $user = User::find($id);
+
+    foreach($user->photos as $photo){
+        echo $photo->path;
+    }
+});
+
+Route::get('post/{id}/photos', function($id){
+    $post = Post::find($id);
+
+    foreach($post->photos as $photo){
+        echo $photo->path;
+    }
+});
+
+Route::get('photo/{id}/owner', function($id){
+    $photo = Photo::findOrFail($id);
+    echo $photo->imageable;
+});
+
+Route::get('/insertvideo', function(){
+    $video1 = new Video;
+    $video1->name = 'basi.mov';
+    $video1->save();
+
+    $video2 = new Video;
+    $video2->name = 'haha.mov';
+    $video2->save();
+
+});
+
+Route::get('/inserttag', function(){
+    $tag1 = new Tag;
+    $tag1->name = 'php';
+    $tag1->save();
+
+    $tag2 = new Tag;
+    $tag2->name = 'JavaScript';
+    $tag2->save();
+
+});
+
+Route::get('/inserttaggable', function(){
+    $var1 = new Taggable;
+    $var1->tag_id = 1;
+    $var1->taggable_id = 1;
+    $var1->taggable_type = 'App\Models\Video';
+    $var1->save();
+
+    $var2 = new Taggable;
+    $var2->tag_id = 2;
+    $var2->taggable_id = 2;
+    $var2->taggable_type = 'App\Models\Post';
+    $var2->save();
+});
+
+Route::get('/{type}/{id}/tag',function($type, $id){
+    if ($type == 'post'){
+        $post = Post::findOrFail($id);
+
+        foreach ($post->tags as $tag){
+            echo $tag->name;
+        }
+    }
+    else{
+        $video = Video::findOrFail($id);
+
+        foreach ($video->tags as $tag){
+            echo $tag->name;
+        }
+    }
+    
+});
+
+Route::get('/tag/{type}/{id}', function($type, $id){
+    $tag = Tag::findOrFail($id);
+
+    if($type == 'post'){
+        foreach($tag->posts as $post){
+            echo $post->post_title;
+        }
+    }
+    else{
+        foreach($tag->videos as $video){
+            echo $video->name;
+        }
+    }
 });
