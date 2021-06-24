@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
@@ -8,7 +7,8 @@ use App\Models\Tag;
 use App\Models\Post;
 use App\Models\Video;
 use App\Models\Taggable;
-
+use App\Models\Role;
+use app\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -496,48 +496,50 @@ Route::get('/', function () {
 // });
 
 //Polymorphic Many to many
-Route::get('/insert', function(){
-    $tags = ['PHP', 'Java', 'JS', 'Python', 'C#'];
+// Route::get('/insert', function(){
+//     $tags = ['PHP', 'Java', 'JS', 'Python', 'C#'];
     
-    foreach($tags as $tag){
-        $newTag = New Tag;
-        $newTag->name = $tag;
-        $newTag->save();
-    }
+//     foreach($tags as $tag){
+//         $newTag = New Tag;
+//         $newTag->name = $tag;
+//         $newTag->save();
+//     }
 
-});
+// });
 
-Route::get('/create', function(){
-    $post = Post::create(['name'=>'post 1']);
-    $tag = Tag::findOrFail(1);
-    $post->tags()->save($tag);
-    // $post->save();
+// Route::get('/create', function(){
+//     $post = Post::create(['name'=>'post 1']);
+//     $tag = Tag::findOrFail(1);
+//     $post->tags()->save($tag);
+//     // $post->save();
 
-    $video = Video::create(['name'=>'video 1']);
-    $tag = Tag::findOrFail(2);
-    $video->tags()->save($tag);
-    // $video->save();
-});
+//     $video = Video::create(['name'=>'video 1']);
+//     $tag = Tag::findOrFail(2);
+//     $video->tags()->save($tag);
+//     // $video->save();
+// });
 
-Route::get('/read', function(){
-    $post = Post::findOrFail(14);
+// Route::get('/read', function(){
+//     $post = Post::findOrFail(14);
 
-    foreach($post->tags as $tag){
-        echo $tag;
-    }
+//     foreach($post->tags as $tag){
+//         echo $tag;
+//     }
 
-});
+// });
 
-Route::get('/update', function(){
-    $post = Post::findOrFail(14);
-    foreach($post->tags as $tag){
-        $tag->where('Name', 'PHP')->update(['name'=>'PHP2']);
-    }
-});
+// Route::get('/update', function(){
+//     $post = Post::findOrFail(14);
+//     foreach($post->tags as $tag){
+//         $tag->where('Name', 'PHP')->update(['name'=>'PHP2']);
+//     }
+// });
 
-Route::get('/delete', function(){
-    $post = Post::findOrFail(14);
-    foreach($post->tags as $tag){
-        $tag->where('id', 1)->delete();
-    }
-});
+// Route::get('/delete', function(){
+//     $post = Post::findOrFail(14);
+//     foreach($post->tags as $tag){
+//         $tag->where('id', 1)->delete();
+//     }
+// });
+
+Route::resource('/posts', '\App\Http\Controllers\PostController');

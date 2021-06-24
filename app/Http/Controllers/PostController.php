@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -11,10 +12,10 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($postID)
+    public function index()
     {
-        //
-        return 'you are in the Post Controller index method '. $postID;
+        $posts = Post::all();
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -24,7 +25,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        return 'I am the creator';
+        return view('posts.create');
     }
 
     /**
@@ -35,7 +36,12 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $post = new Post;
+        $post->user_id = $request->user_id;
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->save();
+        return redirect('/posts');
     }
 
     /**
@@ -46,7 +52,9 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        return 'In post.show and the post id is: '. $id;
+        $posts = Post::find($id);
+        // echo ($posts);
+        return view('posts.show', compact('posts'));
     }
 
     /**
@@ -57,7 +65,9 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        //
+        $post = Post::findOrFail($id);
+
+        return view('posts.edit', compact('post'));
     }
 
     /**
@@ -69,7 +79,11 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $post = Post::findOrFail($id);
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->save();
+        return redirect('/posts');
     }
 
     /**
@@ -80,7 +94,10 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        echo ('destroy');
+        $post = Post::findOrFail($id);
+        $post->delete();
+        return redirect('/posts');
     }
 
     public function contact(){
